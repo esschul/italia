@@ -296,7 +296,6 @@ if (data.error) {
 }
 
 const widget = new ListWidget();
-widget.url = EDGE_URL;
 
 if (data.type === "itinerary") {
   await buildItinerary(widget, data, size);
