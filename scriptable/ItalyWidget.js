@@ -117,18 +117,7 @@ async function buildCountdown(w, data, size) {
   root.setPadding(0, 0, 14, 0);
 
   // Spacer to clear the photo area
-  root.addSpacer(PHOTO_H + 10);
-
-  // Category chip
-  const chipRow = root.addStack();
-  chipRow.setPadding(0, 18, 6, 18);
-  const chip = chipRow.addStack();
-  chip.backgroundColor = chipColor(data.category);
-  chip.cornerRadius = 6;
-  chip.setPadding(2, 8, 2, 8);
-  const chipText = chip.addText(categoryLabel(data.category));
-  chipText.font = Font.boldSystemFont(9);
-  chipText.textColor = C.white;
+  root.addSpacer(PHOTO_H + 14);
 
   // Fun fact
   const factStack = root.addStack();
@@ -138,18 +127,6 @@ async function buildCountdown(w, data, size) {
   fact.textColor = C.offWhite;
   fact.lineLimit = 0;
   fact.minimumScaleFactor = 0.8;
-
-  root.addSpacer();
-
-  // Date
-  const footerStack = root.addStack();
-  footerStack.setPadding(0, 18, 0, 18);
-  const dateStr = new Date().toLocaleDateString("en-GB", {
-    weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Rome",
-  });
-  const dateLabel = footerStack.addText(dateStr);
-  dateLabel.font = Font.systemFont(10);
-  dateLabel.textColor = C.subtle;
 }
 
 // ── Itinerary view ────────────────────────────────────────────────────────────
