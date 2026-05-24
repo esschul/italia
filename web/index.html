@@ -77,7 +77,7 @@
       flex-direction: column;
     }
 
-    /* Photo header — top portion with image + overlay + number on top */
+    /* Photo header — full bleed, widget border-radius clips the corners */
     .countdown .photo-header {
       position: relative;
       width: 100%;
@@ -85,6 +85,8 @@
       flex-shrink: 0;
       overflow: hidden;
       background: #1A1A2A;
+      margin: 0;
+      border-radius: 0;
     }
     .countdown .photo-header img {
       width: 100%;

@@ -108,9 +108,11 @@ async function buildCountdown(w, data, size) {
   grad.locations = [0, 1];
   w.backgroundGradient = grad;
   w.setPadding(0, 0, 0, 0);
+  w.spacing = 0;
 
   const root = w.addStack();
   root.layoutVertically();
+  root.spacing = 0;
   root.setPadding(0, 0, 16, 0);
 
   // Photo header dimensions
