@@ -1,6 +1,20 @@
 // Italy Trip Widget
 const EDGE_URL = "https://cxgxnqxnocwippgeduex.supabase.co/functions/v1/today";
 
+// ── Self-update (runs only when opened in the Scriptable app, not as widget) ──
+if (config.runsInApp) {
+  try {
+    const latest = await new Request(
+      "https://raw.githubusercontent.com/esschul/italia/main/scriptable/ItalyWidget.js"
+    ).loadString();
+    if (latest && latest.length > 500 && latest.includes("EDGE_URL")) {
+      const fm = FileManager.local();
+      const path = fm.joinPath(fm.documentsDirectory(), Script.name() + ".js");
+      if (fm.fileExists(path)) fm.writeString(path, latest);
+    }
+  } catch (_) {}
+}
+
 // ── Fetch ─────────────────────────────────────────────────────────────────────
 
 async function fetchContent() {
