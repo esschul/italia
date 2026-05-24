@@ -71,79 +71,104 @@
 
     /* ── Countdown ── */
     .countdown {
-      background: linear-gradient(160deg, #2D1B0E 0%, #1A1A2A 50%, #0D1F0D 100%);
-      padding: 18px 20px 16px;
+      background: linear-gradient(160deg, #111118 0%, #0D1A0D 100%);
       height: 100%;
       display: flex;
       flex-direction: column;
-      gap: 0;
     }
-    .countdown .header {
+
+    /* Photo header — top portion with image + overlay + number on top */
+    .countdown .photo-header {
+      position: relative;
+      width: 100%;
+      height: 218px;
+      flex-shrink: 0;
+      overflow: hidden;
+      background: #1A1A2A;
+    }
+    .countdown .photo-header img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .countdown .photo-header .photo-emoji {
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      font-size: 90px;
+      opacity: 0.25;
     }
-    .countdown .header .flag-label {
+    .countdown .photo-header .gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(8,8,8,0.05) 0%,
+        rgba(8,8,8,0.3)  40%,
+        rgba(8,8,8,0.82) 100%
+      );
+    }
+    .countdown .photo-header .header-row {
+      position: absolute;
+      top: 14px;
+      left: 18px;
+      right: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .countdown .photo-header .flag-label {
       color: #D4A843;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.06em;
     }
     .countdown .chip {
-      display: inline-block;
-      border-radius: 6px;
-      padding: 2px 8px;
+      border-radius: 5px;
+      padding: 3px 8px;
       font-size: 9px;
       font-weight: 700;
       color: #fff;
     }
-    .countdown .illustration {
-      margin-top: 12px;
-      width: 100%;
-      height: 148px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #ffffff18;
-      border-radius: 14px;
-      font-size: 80px;
-      flex-shrink: 0;
-      overflow: hidden;
+    .countdown .photo-header .number-block {
+      position: absolute;
+      bottom: 14px;
+      left: 18px;
     }
-    .countdown .illustration img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .countdown .big-number {
-      font-size: 80px;
+    .countdown .photo-header .big-number {
+      font-size: 86px;
       font-weight: 800;
       color: #fff;
       line-height: 1;
       letter-spacing: -3px;
-      margin-top: 10px;
-      flex-shrink: 0;
     }
-    .countdown .days-label {
-      color: #ffffff99;
-      font-size: 14px;
+    .countdown .photo-header .days-label {
+      color: rgba(255,255,255,0.73);
+      font-size: 15px;
       font-weight: 500;
-      margin-top: 2px;
-      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Content below the photo */
+    .countdown .content {
+      flex: 1;
+      padding: 12px 18px 14px;
+      display: flex;
+      flex-direction: column;
     }
     .countdown .fact {
       color: #F5F0E8;
       font-size: 12px;
-      line-height: 1.5;
-      margin-top: 8px;
+      line-height: 1.55;
       flex: 1;
-      overflow: hidden;
     }
     .countdown .date-label {
       color: #ffffff55;
       font-size: 10px;
-      margin-top: 6px;
-      flex-shrink: 0;
+      margin-top: 8px;
     }
 
     /* ── Itinerary ── */
@@ -332,9 +357,9 @@
         ? `<div class="chip" style="background:${CHIP_COLORS[d.category] ?? '#333'}">${CATEGORY_LABELS[d.category] ?? "🇮🇹 Italy"}</div>`
         : "";
 
-      const illustration = d.illustration_url
-        ? `<img src="${d.illustration_url}" alt="illustration" />`
-        : (CATEGORY_EMOJI[d.category] ?? "🇮🇹");
+      const photoContent = d.illustration_url
+        ? `<img src="${d.illustration_url}" alt="" />`
+        : `<div class="photo-emoji">${CATEGORY_EMOJI[d.category] ?? "🇮🇹"}</div>`;
 
       const dateStr = new Date().toLocaleDateString("en-GB", {
         weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Rome",
@@ -343,15 +368,22 @@
       return `
         <div class="widget">
           <div class="countdown">
-            <div class="header">
-              <span class="flag-label">🇮🇹  ITALY</span>
-              ${chip}
+            <div class="photo-header">
+              ${photoContent}
+              <div class="gradient"></div>
+              <div class="header-row">
+                <span class="flag-label">🇮🇹  ITALY</span>
+                ${chip}
+              </div>
+              <div class="number-block">
+                <div class="big-number">${d.days_until_trip ?? "?"}</div>
+                <div class="days-label">days to go</div>
+              </div>
             </div>
-            <div class="illustration">${illustration}</div>
-            <div class="big-number">${d.days_until_trip ?? "?"}</div>
-            <div class="days-label">days to go</div>
-            <div class="fact">${d.fun_fact ?? ""}</div>
-            <div class="date-label">${dateStr}</div>
+            <div class="content">
+              <div class="fact">${d.fun_fact ?? ""}</div>
+              <div class="date-label">${dateStr}</div>
+            </div>
           </div>
         </div>`;
     }
