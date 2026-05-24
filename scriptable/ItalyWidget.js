@@ -67,35 +67,61 @@ async function makePhotoHeader(photo, data, width, height) {
 // ── Countdown view ────────────────────────────────────────────────────────────
 
 async function buildCountdown(w, data, size) {
-  const grad = new LinearGradient();
-  grad.colors    = [new Color("#111118"), new Color("#0D1A0D")];
-  grad.locations = [0, 1];
-  w.backgroundGradient = grad;
+  // ── Canvas dimensions ─────────────────────────────────────────────────────
+  // Large widget is ~338×354 pt. Photo fills the top 215pt, dark below.
+  const CW       = 338;
+  const CH       = 354;
+  const PHOTO_H  = 215;
+
+  // ── Build full-widget background image in DrawContext ─────────────────────
+  const dc = new DrawContext();
+  dc.size = new Size(CW, CH);
+  dc.respectScreenScale = true;
+  dc.opaque = true;
+
+  const photo = data.illustration_url ? await fetchImage(data.illustration_url) : null;
+
+  // Photo (top portion)
+  if (photo) {
+    dc.drawImageInRect(photo, new Rect(0, 0, CW, PHOTO_H));
+  } else {
+    dc.setFillColor(new Color("#1A1A2A"));
+    dc.fillRect(new Rect(0, 0, CW, PHOTO_H));
+  }
+
+  // Dark content area (bottom portion)
+  dc.setFillColor(new Color("#111118"));
+  dc.fillRect(new Rect(0, PHOTO_H, CW, CH - PHOTO_H));
+
+  // Number at bottom of photo
+  const numStr  = String(data.days_until_trip ?? "?");
+  const numSize = numStr.length > 2 ? 72 : 84;
+  dc.setFont(Font.boldSystemFont(numSize));
+  dc.setTextColor(C.white);
+  dc.drawText(numStr, new Point(18, PHOTO_H - numSize - 28));
+
+  // "days to go"
+  dc.setFont(Font.mediumSystemFont(15));
+  dc.setTextColor(new Color("#FFFFFFBB"));
+  dc.drawText("days to go", new Point(20, PHOTO_H - 26));
+
+  // Set as widget background — truly edge-to-edge, no insets
+  w.backgroundImage = dc.getImage();
   w.setPadding(0, 0, 0, 0);
   w.spacing = 0;
 
+  // ── Content stacks float over the dark background area ────────────────────
   const root = w.addStack();
   root.layoutVertically();
   root.spacing = 0;
-  root.setPadding(0, 0, 16, 0);
+  root.setPadding(0, 0, 14, 0);
 
-  // Photo header dimensions
-  const WIDGET_W  = 360;
-  const headerH   = size === "large" ? 218 : 108;
+  // Spacer to clear the photo area
+  root.addSpacer(PHOTO_H + 10);
 
-  const photo = data.illustration_url ? await fetchImage(data.illustration_url) : null;
-  const headerImg = await makePhotoHeader(photo, data, WIDGET_W, headerH);
-
-  const imgEl = root.addImage(headerImg);
-  imgEl.imageSize = new Size(WIDGET_W, headerH);
-  imgEl.cornerRadius = size === "large" ? 0 : 0; // widget corners handle rounding
-  imgEl.applyFillingContentMode();
-
-  root.addSpacer(12);
-
-  // ── Category chip ─────────────────────────────────────────────────────────
+  // Category chip
   const chipRow = root.addStack();
-  chipRow.setPadding(0, 18, 0, 18);
+  chipRow.setPadding(0, 18, 6, 18);
   const chip = chipRow.addStack();
   chip.backgroundColor = chipColor(data.category);
   chip.cornerRadius = 6;
@@ -104,20 +130,18 @@ async function buildCountdown(w, data, size) {
   chipText.font = Font.boldSystemFont(9);
   chipText.textColor = C.white;
 
-  root.addSpacer(6);
-
-  // ── Fun fact ──────────────────────────────────────────────────────────────
+  // Fun fact
   const factStack = root.addStack();
   factStack.setPadding(0, 18, 0, 18);
   const fact = factStack.addText(data.fun_fact ?? "");
-  fact.font = Font.systemFont(size === "large" ? 13 : 11);
+  fact.font = Font.systemFont(13);
   fact.textColor = C.offWhite;
-  fact.lineLimit = size === "large" ? 0 : 3;
-  fact.minimumScaleFactor = 0.85;
+  fact.lineLimit = 0;
+  fact.minimumScaleFactor = 0.8;
 
   root.addSpacer();
 
-  // ── Date footer ───────────────────────────────────────────────────────────
+  // Date
   const footerStack = root.addStack();
   footerStack.setPadding(0, 18, 0, 18);
   const dateStr = new Date().toLocaleDateString("en-GB", {
