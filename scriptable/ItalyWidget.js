@@ -1,5 +1,19 @@
 // Italy Trip Widget
-const EDGE_URL = "https://cxgxnqxnocwippgeduex.supabase.co/functions/v1/today";
+const EDGE_URL   = "https://cxgxnqxnocwippgeduex.supabase.co/functions/v1/today";
+const SCRIPT_URL = "https://raw.githubusercontent.com/esschul/italia/main/scriptable/ItalyWidget.js";
+
+// ── Self-update ───────────────────────────────────────────────────────────────
+// Silently pulls the latest version from GitHub each time the script is opened
+// in the Scriptable app (not when running as a widget, so no widget delay).
+if (config.runsInApp) {
+  try {
+    const fm   = FileManager.iCloud();
+    const path = fm.joinPath(fm.documentsDirectory(), Script.name() + ".js");
+    const req  = new Request(SCRIPT_URL);
+    const latest = await req.loadString();
+    fm.writeString(path, latest);
+  } catch (_) { /* update failed silently — widget still runs */ }
+}
 
 // ── Fetch ─────────────────────────────────────────────────────────────────────
 
