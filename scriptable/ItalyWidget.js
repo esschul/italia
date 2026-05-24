@@ -36,66 +36,40 @@ const C = {
 async function makePhotoHeader(photo, data, width, height) {
   const dc = new DrawContext();
   dc.size = new Size(width, height);
+  dc.respectScreenScale = true; // render at full screen resolution — no blur
   dc.opaque = true;
 
-  // ── Photo (or solid fallback) ──────────────────────────────────────────────
+  // ── Photo (or dark fallback) ──────────────────────────────────────────────
   if (photo) {
     dc.drawImageInRect(photo, new Rect(0, 0, width, height));
   } else {
     dc.setFillColor(new Color("#1A1A2A"));
     dc.fillRect(new Rect(0, 0, width, height));
-    // Large category emoji as placeholder
-    dc.setFont(Font.systemFont(height * 0.55));
-    dc.setTextColor(new Color("#FFFFFF33"));
-    dc.drawTextInRect(
-      categoryEmoji(data.category),
-      new Rect(width / 2 - 60, height / 2 - 60, 120, 120)
-    );
   }
 
-  // ── Gradient overlay — darkens bottom two-thirds for legibility ───────────
-  const steps = 12;
-  for (let i = 0; i < steps; i++) {
-    const t     = i / (steps - 1);
-    const alpha = Math.pow(t, 1.4) * 0.82; // ease in
-    const y     = (i / steps) * height;
-    dc.setFillColor(new Color("#080808", alpha));
-    dc.fillRect(new Rect(0, y, width, height / steps + 1));
-  }
-
-  // ── Header row: 🇮🇹 ITALY (left) + category chip (right) ─────────────────
-  const pad = 18;
-  dc.setTextColor(C.gold);
-  dc.setFont(Font.boldSystemFont(11));
-  dc.drawText("🇮🇹  ITALY", new Point(pad, 14));
-
-  // Category chip — draw a rounded rect + text
-  const chipLabel  = categoryLabel(data.category);
-  dc.setFont(Font.boldSystemFont(9));
-  const chipW  = chipLabel.length * 6.2 + 20;
-  const chipH  = 20;
-  const chipX  = width - pad - chipW;
-  const chipY  = 11;
-  const chipBg = chipColor(data.category);
-  dc.setFillColor(chipBg);
-  const chipPath = new Path();
-  chipPath.addRoundedRect(new Rect(chipX, chipY, chipW, chipH), 5, 5);
-  dc.addPath(chipPath);
-  dc.fillPath();
-  dc.setTextColor(C.white);
-  dc.drawText(chipLabel, new Point(chipX + 8, chipY + 4));
+  // ── Smooth gradient overlay: 3 layers, no banding ────────────────────────
+  // Light overall darken
+  dc.setFillColor(new Color("#000000", 0.18));
+  dc.fillRect(new Rect(0, 0, width, height));
+  // Heavier on the bottom half
+  dc.setFillColor(new Color("#000000", 0.45));
+  dc.fillRect(new Rect(0, height * 0.45, width, height * 0.55));
+  // Extra dark strip at very bottom for number legibility
+  dc.setFillColor(new Color("#000000", 0.35));
+  dc.fillRect(new Rect(0, height * 0.72, width, height * 0.28));
 
   // ── Big number ────────────────────────────────────────────────────────────
+  const pad     = 18;
   const numStr  = String(data.days_until_trip ?? "?");
   const numSize = numStr.length > 2 ? 74 : 86;
   dc.setFont(Font.boldSystemFont(numSize));
   dc.setTextColor(C.white);
-  dc.drawText(numStr, new Point(pad, height - numSize - 26));
+  dc.drawText(numStr, new Point(pad, height - numSize - 28));
 
   // ── "days to go" subtitle ─────────────────────────────────────────────────
   dc.setFont(Font.mediumSystemFont(15));
   dc.setTextColor(new Color("#FFFFFFBB"));
-  dc.drawText("days to go", new Point(pad + 3, height - 22));
+  dc.drawText("days to go", new Point(pad + 2, height - 26));
 
   return dc.getImage();
 }
@@ -128,6 +102,19 @@ async function buildCountdown(w, data, size) {
   imgEl.applyFillingContentMode();
 
   root.addSpacer(12);
+
+  // ── Category chip ─────────────────────────────────────────────────────────
+  const chipRow = root.addStack();
+  chipRow.setPadding(0, 18, 0, 18);
+  const chip = chipRow.addStack();
+  chip.backgroundColor = chipColor(data.category);
+  chip.cornerRadius = 6;
+  chip.setPadding(2, 8, 2, 8);
+  const chipText = chip.addText(categoryLabel(data.category));
+  chipText.font = Font.boldSystemFont(9);
+  chipText.textColor = C.white;
+
+  root.addSpacer(6);
 
   // ── Fun fact ──────────────────────────────────────────────────────────────
   const factStack = root.addStack();
