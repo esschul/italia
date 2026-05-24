@@ -329,6 +329,28 @@ try {
   throw new Error("fetch failed");
 }
 
+// Edge function returned an error (e.g. DB not seeded yet)
+if (data.error) {
+  const w = new ListWidget();
+  const grad = new LinearGradient();
+  grad.colors = [new Color("#2D1B0E"), new Color("#1A1A2A")];
+  grad.locations = [0, 1];
+  w.backgroundGradient = grad;
+  w.setPadding(16, 18, 16, 18);
+  const t1 = w.addText("🇮🇹  Italia");
+  t1.font = Font.boldSystemFont(14);
+  t1.textColor = C.gold;
+  w.addSpacer(8);
+  const t2 = w.addText("No content yet — run the seed SQL in Supabase to get started.");
+  t2.font = Font.systemFont(12);
+  t2.textColor = C.dimText;
+  t2.lineLimit = 3;
+  Script.setWidget(w);
+  if (config.runsInApp) await w.presentMedium();
+  Script.complete();
+  return;
+}
+
 const widget = new ListWidget();
 widget.url = EDGE_URL;
 
