@@ -5,6 +5,60 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// ── Unsplash photo query per category / location ──────────────────────────────
+
+function photoQuery(data: Record<string, unknown>): string {
+  if (data.type === "itinerary" && data.location) {
+    return `${data.location} italy travel`;
+  }
+  const map: Record<string, string> = {
+    history:  "ancient rome ruins colosseum",
+    recipe:   "italian food cuisine",
+    culture:  "italy culture piazza",
+    language: "tuscany italy village",
+    nature:   "italy landscape amalfi",
+  };
+  return map[data.category as string] ?? "italy travel";
+}
+
+// ── Fetch a photo from Unsplash and cache it in the DB row ────────────────────
+
+async function resolvePhoto(
+  supabase: ReturnType<typeof createClient>,
+  data: Record<string, unknown>,
+): Promise<string | null> {
+  // Already cached — use it
+  if (data.illustration_url) return data.illustration_url as string;
+
+  const accessKey = Deno.env.get("UNSPLASH_ACCESS_KEY");
+  if (!accessKey) return null;
+
+  try {
+    const query = photoQuery(data);
+    const res = await fetch(
+      `https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&orientation=landscape&content_filter=high&client_id=${accessKey}`,
+    );
+    if (!res.ok) return null;
+
+    const photo = await res.json();
+    const url: string | null = photo.urls?.regular ?? null;
+
+    // Save to DB so subsequent loads skip the Unsplash call
+    if (url) {
+      await supabase
+        .from("daily_content")
+        .update({ illustration_url: url })
+        .eq("id", data.id);
+    }
+
+    return url;
+  } catch {
+    return null;
+  }
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -15,15 +69,13 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  // Use ?date=YYYY-MM-DD for testing, otherwise today in Europe/Rome timezone
-  const url = new URL(req.url);
+  const url     = new URL(req.url);
   const dateParam = url.searchParams.get("date");
-
-  const today = dateParam
+  const today   = dateParam
     ? dateParam
     : new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Rome" });
 
-  // Try exact match first
+  // Exact match first
   let { data, error } = await supabase
     .from("daily_content")
     .select("*")
@@ -37,7 +89,7 @@ Deno.serve(async (req) => {
     });
   }
 
-  // No exact match — find the most recent past entry (handles gaps in countdown)
+  // Fall back to most recent past entry
   if (!data) {
     const { data: fallback } = await supabase
       .from("daily_content")
@@ -46,7 +98,6 @@ Deno.serve(async (req) => {
       .order("display_date", { ascending: false })
       .limit(1)
       .maybeSingle();
-
     data = fallback;
   }
 
@@ -57,15 +108,22 @@ Deno.serve(async (req) => {
     );
   }
 
-  // Compute days until trip start (July 11) if this is a countdown entry
-  const tripStart = new Date("2026-07-11");
-  const todayDate = new Date(today);
-  const daysUntil = Math.ceil(
+  // Resolve photo (use cached or fetch fresh from Unsplash)
+  const illustrationUrl = await resolvePhoto(supabase, data);
+
+  // Days until trip
+  const tripStart  = new Date("2026-07-11");
+  const todayDate  = new Date(today);
+  const daysUntil  = Math.ceil(
     (tripStart.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24),
   );
 
   return new Response(
-    JSON.stringify({ ...data, days_until_trip: daysUntil > 0 ? daysUntil : null }),
+    JSON.stringify({
+      ...data,
+      illustration_url: illustrationUrl,
+      days_until_trip: daysUntil > 0 ? daysUntil : null,
+    }),
     { headers: { ...corsHeaders, "Content-Type": "application/json" } },
   );
 });
