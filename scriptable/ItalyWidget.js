@@ -7,11 +7,20 @@ const SCRIPT_URL = "https://raw.githubusercontent.com/esschul/italia/main/script
 // in the Scriptable app (not when running as a widget, so no widget delay).
 if (config.runsInApp) {
   try {
-    const fm   = FileManager.iCloud();
-    const path = fm.joinPath(fm.documentsDirectory(), Script.name() + ".js");
-    const req  = new Request(SCRIPT_URL);
+    const req    = new Request(SCRIPT_URL);
     const latest = await req.loadString();
-    fm.writeString(path, latest);
+
+    // Sanity check — never overwrite with empty or broken content
+    if (latest && latest.length > 500 && latest.includes("EDGE_URL")) {
+      // Find where the script actually lives (iCloud or local)
+      for (const fm of [FileManager.iCloud(), FileManager.local()]) {
+        const path = fm.joinPath(fm.documentsDirectory(), Script.name() + ".js");
+        if (fm.fileExists(path)) {
+          fm.writeString(path, latest);
+          break;
+        }
+      }
+    }
   } catch (_) { /* update failed silently — widget still runs */ }
 }
 
