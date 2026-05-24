@@ -1,0 +1,29 @@
+[
+  {
+    "date": "2026-07-11",
+    "title": "Day 1 — Arrival 🛬",
+    "location": "Rome",
+    "lat": 41.9028,
+    "lon": 12.4964,
+    "description": "Transfer to hotel. Drop bags, find the nearest trattoria, walk to Trastevere in the evening.",
+    "fun_fact": "Rome has more than 280 public fountains — the water is drinkable everywhere."
+  },
+  {
+    "date": "2026-07-12",
+    "title": "Day 2 — Ancient Rome 🏛️",
+    "location": "Rome",
+    "lat": 41.9028,
+    "lon": 12.4964,
+    "description": "Colosseum, Roman Forum, Palatine Hill in the morning. Gelato break at Giolitti. Trevi Fountain at sunset.",
+    "fun_fact": "The Forum Romanum was the centre of Roman public life for over 1,000 years — elections, trials, triumphs and commerce all happened here."
+  },
+  {
+    "date": "2026-07-13",
+    "title": "Day 3 — Vatican & Prati 🎨",
+    "location": "Rome",
+    "lat": 41.9029,
+    "lon": 12.4534,
+    "description": "Vatican Museums early (book in advance!), Sistine Chapel, St Peter's. Lunch in Prati neighbourhood.",
+    "fun_fact": "Michelangelo painted the Sistine Chapel ceiling lying on his back over 4 years (1508–1512). He was a sculptor, not a painter — he considered the commission an insult."
+  }
+]

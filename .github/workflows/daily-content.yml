@@ -1,0 +1,24 @@
+name: Populate daily content
+
+on:
+  schedule:
+    # 06:00 Rome time (UTC+2 in summer) = 04:00 UTC
+    - cron: "0 4 * * *"
+  workflow_dispatch: # allow manual trigger from GitHub UI
+
+jobs:
+  populate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Populate today's itinerary entry
+        working-directory: scripts
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node populate-today.js
