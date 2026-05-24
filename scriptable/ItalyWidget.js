@@ -47,16 +47,6 @@ async function makePhotoHeader(photo, data, width, height) {
     dc.fillRect(new Rect(0, 0, width, height));
   }
 
-  // ── Smooth gradient overlay: 3 layers, no banding ────────────────────────
-  // Light overall darken
-  dc.setFillColor(new Color("#000000", 0.18));
-  dc.fillRect(new Rect(0, 0, width, height));
-  // Heavier on the bottom half
-  dc.setFillColor(new Color("#000000", 0.45));
-  dc.fillRect(new Rect(0, height * 0.45, width, height * 0.55));
-  // Extra dark strip at very bottom for number legibility
-  dc.setFillColor(new Color("#000000", 0.35));
-  dc.fillRect(new Rect(0, height * 0.72, width, height * 0.28));
 
   // ── Big number ────────────────────────────────────────────────────────────
   const pad     = 18;
