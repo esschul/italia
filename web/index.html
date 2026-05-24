@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Italia Widget Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #111;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      gap: 32px;
+    }
+
+    h1 {
+      color: #D4A843;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .controls label { color: #888; font-size: 13px; }
+
+    .controls input[type="date"] {
+      background: #222;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .controls button {
+      background: #D4A843;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .controls button:hover { background: #e8bc58; }
+
+    /* ── Widget shell (iPhone medium widget proportions) ── */
+    .widget {
+      width: 338px;
+      height: 158px;
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+
+    /* ── Countdown ── */
+    .countdown {
+      background: linear-gradient(135deg, #2D1B0E 0%, #1A1A2A 50%, #0D1F0D 100%);
+      padding: 16px 18px 14px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .countdown .header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .countdown .header .flag { font-size: 14px; }
+    .countdown .header .label {
+      color: #D4A843;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .countdown .body {
+      flex: 1;
+      display: flex;
+      gap: 0;
+      margin-top: 6px;
+    }
+    .countdown .left {
+      display: flex;
+      flex-direction: column;
+      width: 130px;
+      flex-shrink: 0;
+    }
+    .countdown .big-number {
+      font-size: 64px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+      letter-spacing: -2px;
+    }
+    .countdown .days-label {
+      color: #ffffff99;
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+    .countdown .date-label {
+      color: #ffffff44;
+      font-size: 9px;
+      margin-top: auto;
+    }
+    .countdown .illustration {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff18;
+      border-radius: 12px;
+      font-size: 56px;
+      margin-left: 10px;
+    }
+    .countdown .illustration img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+    .countdown .bottom {
+      margin-top: 10px;
+    }
+    .countdown .chip {
+      display: inline-block;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 5px;
+    }
+    .countdown .fact {
+      color: #F5F0E8;
+      font-size: 11px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ── Itinerary ── */
+    .itinerary {
+      background: linear-gradient(135deg, #0A1628 0%, #0D2B3E 50%, #0A1E1A 100%);
+      padding: 14px 16px 12px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .itinerary .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .itinerary .title {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 260px;
+    }
+    .itinerary .mid-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .itinerary .location {
+      color: #7EC8E3;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .itinerary .weather {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: #ffffff18;
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: #fff;
+    }
+    .itinerary .weather .temp {
+      color: #D4A843;
+      font-weight: 700;
+    }
+    .itinerary .weather .rain {
+      color: #7EC8E3;
+      font-size: 10px;
+    }
+    .itinerary .divider {
+      width: 32px;
+      height: 1.5px;
+      background: #D4A843;
+      border-radius: 1px;
+      margin: 8px 0;
+    }
+    .itinerary .description {
+      color: #F5F0E8;
+      font-size: 11px;
+      line-height: 1.45;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .itinerary .fact-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+      background: #ffffff18;
+      border-radius: 8px;
+      padding: 5px 9px;
+      margin-top: 6px;
+    }
+    .itinerary .fact-star {
+      color: #D4A843;
+      font-size: 9px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .itinerary .fact-text {
+      color: #ffffff99;
+      font-size: 10px;
+      font-style: italic;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ── Status ── */
+    .status {
+      color: #666;
+      font-size: 12px;
+      min-height: 20px;
+    }
+    .status.error { color: #e06c75; }
+
+    /* ── Empty state ── */
+    .empty {
+      color: #ffffff55;
+      font-size: 12px;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🇮🇹 Italia Widget Preview</h1>
+
+  <div class="controls">
+    <label for="dateInput">Preview date</label>
+    <input type="date" id="dateInput" />
+    <button onclick="load()">Load</button>
+  </div>
+
+  <div class="status" id="status">Loading…</div>
+
+  <div id="widget-container"></div>
+
+  <script>
+    const EDGE_URL = "https://cxgxnqxnocwippgeduex.supabase.co/functions/v1/today";
+
+    const CHIP_COLORS = {
+      history:  "#6B3A2A",
+      recipe:   "#2A4A1A",
+      culture:  "#2A2A5A",
+      language: "#3A2A5A",
+      nature:   "#1A4A2A",
+      itinerary:"#1A3A4A",
+    };
+
+    const CATEGORY_LABELS = {
+      history:  "🏛  Ancient History",
+      recipe:   "🍳  Recipe",
+      culture:  "🎭  Culture",
+      language: "💬  Italian",
+      nature:   "🌿  Nature",
+    };
+
+    const CATEGORY_EMOJI = {
+      history: "🏛", recipe: "🍝", culture: "🎭",
+      language: "💬", nature: "🌿",
+    };
+
+    function todayRome() {
+      return new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Rome" });
+    }
+
+    // Set date input default to today
+    const input = document.getElementById("dateInput");
+    input.value = todayRome();
+    input.addEventListener("keydown", e => { if (e.key === "Enter") load(); });
+
+    async function load() {
+      const date = input.value || todayRome();
+      const status = document.getElementById("status");
+      const container = document.getElementById("widget-container");
+
+      status.className = "status";
+      status.textContent = "Fetching…";
+      container.innerHTML = "";
+
+      try {
+        const res = await fetch(`${EDGE_URL}?date=${date}`);
+        const data = await res.json();
+
+        if (data.error) {
+          status.className = "status error";
+          status.textContent = `⚠️ ${data.error}`;
+          container.innerHTML = `<div class="empty">No content for this date.<br>Run seed_countdown.sql in Supabase first.</div>`;
+          return;
+        }
+
+        status.textContent = `${data.type} · ${data.display_date}`;
+        container.innerHTML = data.type === "itinerary"
+          ? renderItinerary(data)
+          : renderCountdown(data);
+
+      } catch (e) {
+        status.className = "status error";
+        status.textContent = `Error: ${e.message}`;
+      }
+    }
+
+    function renderCountdown(d) {
+      const chip = d.category
+        ? `<div class="chip" style="background:${CHIP_COLORS[d.category] ?? '#333'}">${CATEGORY_LABELS[d.category] ?? "🇮🇹 Italy"}</div>`
+        : "";
+
+      const illustration = d.illustration_url
+        ? `<img src="${d.illustration_url}" alt="illustration" />`
+        : (CATEGORY_EMOJI[d.category] ?? "🇮🇹");
+
+      const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "Europe/Rome" });
+
+      return `
+        <div class="widget">
+          <div class="countdown">
+            <div class="header">
+              <span class="flag">🇮🇹</span>
+              <span class="label">ITALY</span>
+            </div>
+            <div class="body">
+              <div class="left">
+                <div class="big-number">${d.days_until_trip ?? "?"}</div>
+                <div class="days-label">days to go</div>
+                <div class="date-label">${today}</div>
+              </div>
+              <div class="illustration">${illustration}</div>
+            </div>
+            <div class="bottom">
+              ${chip}
+              <div class="fact">${d.fun_fact ?? ""}</div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function renderItinerary(d) {
+      const weather = (d.weather_condition || d.weather_temp_max) ? `
+        <div class="weather">
+          <span>${d.weather_condition ?? ""}</span>
+          <span class="temp">${d.weather_temp_max ?? "--"}° / ${d.weather_temp_min ?? "--"}°</span>
+          ${d.weather_precip_pct > 0 ? `<span class="rain">💧${d.weather_precip_pct}%</span>` : ""}
+        </div>` : "";
+
+      return `
+        <div class="widget">
+          <div class="itinerary">
+            <div class="header">
+              <div class="title">${d.title ?? ""}</div>
+              <span>🇮🇹</span>
+            </div>
+            <div class="mid-row">
+              ${d.location ? `<div class="location">📍 ${d.location}</div>` : "<div></div>"}
+              ${weather}
+            </div>
+            <div class="divider"></div>
+            <div class="description">${d.description ?? ""}</div>
+            <div class="fact-row">
+              <span class="fact-star">✦</span>
+              <span class="fact-text">${d.fun_fact ?? ""}</span>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    load();
+  </script>
+</body>
+</html>
