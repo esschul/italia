@@ -534,12 +534,9 @@
         <textarea id="f-fact" oninput="updatePreview()">${esc(entry.fun_fact ?? "")}</textarea>
       </div>
 
-      <div class="field">
-        <label>Category</label>
-        <select id="f-category">
-          ${CATEGORIES.map(c => `<option value="${c}" ${entry.category === c ? "selected" : ""}>${CAT_EMOJI[c]} ${c}</option>`).join("")}
-        </select>
-      </div>
+      <select id="f-category" style="display:none">
+        ${CATEGORIES.map(c => `<option value="${c}" ${entry.category === c ? "selected" : ""}>${CAT_EMOJI[c]} ${c}</option>`).join("")}
+      </select>
 
       <div class="field">
         <label>Countdown number colour</label>
