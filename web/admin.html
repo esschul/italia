@@ -564,7 +564,13 @@
             📁 Upload photo
             <input type="file" accept="image/*" onchange="uploadPhoto(this)" />
           </label>
-          <div class="photo-btn" onclick="useUnsplash()">🔍 Fetch from Unsplash</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:2px">
+          <input type="text" id="unsplash-query" placeholder="e.g. rome colosseum sunset"
+            style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;
+                   color:var(--text);font-size:13px;padding:8px 12px;font-family:inherit;"
+            onkeydown="if(event.key==='Enter')useUnsplash()" />
+          <button class="photo-btn" style="flex:0 0 auto;white-space:nowrap" onclick="useUnsplash()">🔍 Unsplash</button>
         </div>
         <div class="upload-progress" id="uploadProgress">
           <div class="upload-progress-bar" id="uploadBar"></div>
@@ -622,13 +628,19 @@
   // ── Fetch from Unsplash ───────────────────────────────────────────────────
   async function useUnsplash() {
     if (!current) return;
-    setStatus("Fetching from Unsplash…");
+    const q = document.getElementById("unsplash-query")?.value.trim();
+    setStatus(q ? `Searching Unsplash for "${q}"…` : "Fetching from Unsplash…");
+
     // Clear cached URL so the edge function re-fetches
     current.illustration_url = null;
     await sb.from("daily_content").update({ illustration_url: null }).eq("id", current.id);
-    // Call edge function to trigger fetch
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/today?date=${current.display_date}`);
+
+    // Pass optional search query to edge function
+    const params = new URLSearchParams({ date: current.display_date });
+    if (q) params.set("photo_query", q);
+    const res  = await fetch(`${SUPABASE_URL}/functions/v1/today?${params}`);
     const data = await res.json();
+
     if (data.illustration_url) {
       current.illustration_url = data.illustration_url;
       document.getElementById("photoPreview").innerHTML = `

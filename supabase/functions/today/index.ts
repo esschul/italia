@@ -26,15 +26,16 @@ function photoQuery(data: Record<string, unknown>): string {
 async function resolvePhoto(
   supabase: ReturnType<typeof createClient>,
   data: Record<string, unknown>,
+  queryOverride?: string,
 ): Promise<string | null> {
-  // Already cached — use it
-  if (data.illustration_url) return data.illustration_url as string;
+  // Already cached — use it (unless a custom query override was supplied)
+  if (data.illustration_url && !queryOverride) return data.illustration_url as string;
 
   const accessKey = Deno.env.get("UNSPLASH_ACCESS_KEY");
   if (!accessKey) return null;
 
   try {
-    const query = photoQuery(data);
+    const query = queryOverride ?? photoQuery(data);
     const res = await fetch(
       `https://api.unsplash.com/photos/random?query=${encodeURIComponent(query)}&orientation=landscape&content_filter=high&client_id=${accessKey}`,
     );
@@ -69,9 +70,10 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
-  const url     = new URL(req.url);
-  const dateParam = url.searchParams.get("date");
-  const today   = dateParam
+  const url        = new URL(req.url);
+  const dateParam  = url.searchParams.get("date");
+  const photoQuery = url.searchParams.get("photo_query"); // optional override for Unsplash search
+  const today      = dateParam
     ? dateParam
     : new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Rome" });
 
@@ -109,7 +111,8 @@ Deno.serve(async (req) => {
   }
 
   // Resolve photo (use cached or fetch fresh from Unsplash)
-  const illustrationUrl = await resolvePhoto(supabase, data);
+  // If photo_query is provided, always re-fetch regardless of cache
+  const illustrationUrl = await resolvePhoto(supabase, data, photoQuery ?? undefined);
 
   // Days until trip
   const tripStart  = new Date("2026-07-11");
