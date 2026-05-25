@@ -333,33 +333,26 @@
     }
 
     function renderCountdown(d) {
-      const chip = d.category
-        ? `<div class="chip" style="background:${CHIP_COLORS[d.category] ?? '#333'}">${CATEGORY_LABELS[d.category] ?? "🇮🇹 Italy"}</div>`
-        : "";
-
       const photoContent = d.illustration_url
         ? `<img src="${d.illustration_url}" alt="" />`
         : `<div class="photo-emoji">${CATEGORY_EMOJI[d.category] ?? "🇮🇹"}</div>`;
 
-      const dateStr = new Date().toLocaleDateString("en-GB", {
-        weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Rome",
-      });
+      const isBlack  = d.number_color === "black";
+      const numColor = isBlack ? "#000000" : "#ffffff";
+      const subColor = isBlack ? "rgba(0,0,0,0.73)" : "rgba(255,255,255,0.73)";
 
       return `
         <div class="widget">
           <div class="countdown">
             <div class="photo-header">
               ${photoContent}
-              <div class="gradient"></div>
               <div class="number-block">
-                <div class="big-number">${d.days_until_trip ?? "?"}</div>
-                <div class="days-label">days to go</div>
+                <div class="big-number" style="color:${numColor}">${d.days_until_trip ?? "?"}</div>
+                <div class="days-label" style="color:${subColor}">days to go</div>
               </div>
             </div>
             <div class="content">
-              ${chip}
               <div class="fact">${d.fun_fact ?? ""}</div>
-              <div class="date-label">${dateStr}</div>
             </div>
           </div>
         </div>`;

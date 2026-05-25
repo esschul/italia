@@ -108,15 +108,16 @@ async function buildCountdown(w, data, size) {
   dc.fillRect(new Rect(0, PHOTO_H, CW, CH - PHOTO_H));
 
   // Number at bottom of photo
-  const numStr  = String(data.days_until_trip ?? "?");
-  const numSize = numStr.length > 2 ? 72 : 84;
+  const numStr    = String(data.days_until_trip ?? "?");
+  const numSize   = numStr.length > 2 ? 72 : 84;
+  const blackText = data.number_color === "black";
   dc.setFont(Font.boldSystemFont(numSize));
-  dc.setTextColor(C.white);
+  dc.setTextColor(blackText ? new Color("#000000") : C.white);
   dc.drawText(numStr, new Point(18, PHOTO_H - numSize - 28));
 
   // "days to go"
   dc.setFont(Font.mediumSystemFont(15));
-  dc.setTextColor(new Color("#FFFFFFBB"));
+  dc.setTextColor(blackText ? new Color("#000000BB") : new Color("#FFFFFFBB"));
   dc.drawText("days to go", new Point(20, PHOTO_H - 26));
 
   // Set as widget background — truly edge-to-edge, no insets
