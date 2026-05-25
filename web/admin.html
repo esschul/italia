@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Italia Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0e0e0e;
+      --surface:  #1a1a1a;
+      --border:   #2a2a2a;
+      --gold:     #D4A843;
+      --text:     #f0f0f0;
+      --muted:    #888;
+      --accent:   #D4A843;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .topbar h1 { font-size: 15px; font-weight: 700; color: var(--gold); }
+    .topbar .spacer { flex: 1; }
+    .topbar .key-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .topbar .key-btn:hover { color: var(--text); }
+
+    /* ── Layout ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr 380px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+    .sidebar-month {
+      padding: 10px 16px 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      transition: background 0.1s;
+    }
+    .sidebar-item:hover { background: #ffffff08; }
+    .sidebar-item.active {
+      background: #ffffff10;
+      border-left-color: var(--gold);
+    }
+    .sidebar-item .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+    .sidebar-item.has-photo .dot { background: var(--gold); }
+    .sidebar-item .item-date { font-size: 11px; color: var(--muted); width: 46px; flex-shrink: 0; }
+    .sidebar-item .item-title { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── Editor ── */
+    .editor {
+      padding: 28px 32px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+    .editor-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .editor-date { font-size: 13px; color: var(--muted); }
+    .save-btn {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 22px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .save-btn:hover { opacity: 0.85; }
+    .save-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .field input, .field textarea, .field select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 13px;
+      padding: 10px 12px;
+      font-family: inherit;
+      transition: border-color 0.15s;
+      resize: vertical;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .field textarea { min-height: 110px; line-height: 1.55; }
+    .field select option { background: var(--surface); }
+
+    /* ── Photo section ── */
+    .photo-section { display: flex; flex-direction: column; gap: 10px; }
+    .photo-preview {
+      width: 100%;
+      height: 160px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .photo-preview .remove-photo {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.7);
+      border: none;
+      color: #fff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .photo-actions { display: flex; gap: 8px; }
+    .photo-btn {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color 0.15s;
+    }
+    .photo-btn:hover { border-color: var(--gold); }
+    .photo-btn input[type="file"] { display: none; }
+
+    .upload-progress {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      display: none;
+    }
+    .upload-progress-bar {
+      height: 100%;
+      background: var(--gold);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .status-msg {
+      font-size: 11px;
+      color: var(--muted);
+      min-height: 16px;
+    }
+    .status-msg.ok  { color: #6abf69; }
+    .status-msg.err { color: #e06c75; }
+
+    /* ── Preview panel ── */
+    .preview-panel {
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 20px;
+      gap: 16px;
+      overflow-y: auto;
+      background: #080808;
+    }
+    .preview-panel h2 { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+    /* Widget preview — reusing styles from index.html */
+    .widget {
+      width: 338px;
+      height: 354px;
+      border-radius: 22px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.8);
+    }
+    .countdown {
+      background: linear-gradient(160deg, #111118 0%, #0D1A0D 100%);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .countdown .photo-header {
+      position: relative;
+      width: 100%;
+      height: 215px;
+      flex-shrink: 0;
+      overflow: hidden;
+      background: #1A1A2A;
+    }
+    .countdown .photo-header img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+    .countdown .photo-header .number-block {
+      position: absolute;
+      bottom: 14px; left: 18px;
+    }
+    .countdown .photo-header .big-number {
+      font-size: 86px; font-weight: 800;
+      color: #fff; line-height: 1; letter-spacing: -3px;
+    }
+    .countdown .photo-header .days-label {
+      color: rgba(255,255,255,0.73);
+      font-size: 15px; font-weight: 500; margin-top: 1px;
+    }
+    .countdown .content {
+      flex: 1;
+      padding: 14px 18px 14px;
+      display: flex;
+      flex-direction: column;
+    }
+    .countdown .fact {
+      color: #F5F0E8;
+      font-size: 12px;
+      line-height: 1.55;
+      flex: 1;
+    }
+    .countdown .photo-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 72px;
+      background: #1a1a2a;
+    }
+
+    /* ── Key modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+    }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .modal h2 { font-size: 16px; color: var(--gold); }
+    .modal p  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .modal input {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 13px;
+      padding: 10px 12px;
+      font-family: monospace;
+    }
+    .modal input:focus { outline: none; border-color: var(--gold); }
+    .modal .modal-btn {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .empty-state {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Key modal -->
+<div class="modal-overlay" id="keyModal">
+  <div class="modal">
+    <h2>🔑 Supabase Service Role Key</h2>
+    <p>Needed once for the admin panel to read and write content. Stored locally in your browser only.</p>
+    <input type="password" id="keyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+    <button class="modal-btn" onclick="saveKey()">Connect</button>
+  </div>
+</div>
+
+<!-- Top bar -->
+<div class="topbar">
+  <span>🇮🇹</span>
+  <h1>Italia Admin</h1>
+  <div class="spacer"></div>
+  <button class="key-btn" onclick="resetKey()">🔑 Change key</button>
+</div>
+
+<!-- Main layout -->
+<div class="layout">
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div style="padding: 20px; color: var(--muted); font-size: 12px;">Loading…</div>
+  </div>
+
+  <!-- Editor -->
+  <div class="editor" id="editor">
+    <div class="empty-state">← Select a day to edit</div>
+  </div>
+
+  <!-- Preview -->
+  <div class="preview-panel">
+    <h2>Widget Preview</h2>
+    <div class="widget" id="widgetPreview">
+      <div class="countdown">
+        <div class="countdown photo-header"><div class="photo-placeholder">🇮🇹</div></div>
+        <div class="content"><div class="fact"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = "https://cxgxnqxnocwippgeduex.supabase.co";
+  const BUCKET      = "illustrations";
+  const CATEGORIES  = ["history", "recipe", "culture", "language", "nature", "joke"];
+  const CAT_EMOJI   = { history:"🏛", recipe:"🍝", culture:"🎭", language:"💬", nature:"🌿", joke:"😄" };
+
+  let sb, entries = [], current = null;
+
+  // ── Key management ────────────────────────────────────────────────────────
+  function getKey() { return localStorage.getItem("italia_service_key"); }
+
+  function saveKey() {
+    const key = document.getElementById("keyInput").value.trim();
+    if (!key) return;
+    localStorage.setItem("italia_service_key", key);
+    document.getElementById("keyModal").style.display = "none";
+    init();
+  }
+
+  function resetKey() {
+    localStorage.removeItem("italia_service_key");
+    document.getElementById("keyInput").value = "";
+    document.getElementById("keyModal").style.display = "flex";
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  async function init() {
+    const key = getKey();
+    if (!key) return;
+    document.getElementById("keyModal").style.display = "none";
+
+    sb = supabase.createClient(SUPABASE_URL, key);
+
+    // Ensure storage bucket exists
+    await sb.storage.createBucket(BUCKET, { public: true }).catch(() => {});
+
+    await loadEntries();
+  }
+
+  // ── Load all entries ──────────────────────────────────────────────────────
+  async function loadEntries() {
+    const { data, error } = await sb
+      .from("daily_content")
+      .select("*")
+      .order("display_date", { ascending: true });
+
+    if (error) { console.error(error); return; }
+    entries = data;
+    renderSidebar();
+  }
+
+  // ── Sidebar ───────────────────────────────────────────────────────────────
+  function renderSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.innerHTML = "";
+    let lastMonth = "";
+
+    for (const e of entries) {
+      const d     = new Date(e.display_date + "T00:00:00");
+      const month = d.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+      const day   = d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+
+      if (month !== lastMonth) {
+        const h = document.createElement("div");
+        h.className = "sidebar-month";
+        h.textContent = month;
+        sidebar.appendChild(h);
+        lastMonth = month;
+      }
+
+      const item = document.createElement("div");
+      item.className = `sidebar-item${e.illustration_url ? " has-photo" : ""}${current?.id === e.id ? " active" : ""}`;
+      item.dataset.id = e.id;
+      item.innerHTML = `
+        <div class="dot"></div>
+        <span class="item-date">${day}</span>
+        <span class="item-title">${e.title ?? e.display_date}</span>`;
+      item.onclick = () => selectEntry(e);
+      sidebar.appendChild(item);
+    }
+  }
+
+  // ── Select & populate editor ──────────────────────────────────────────────
+  function selectEntry(entry) {
+    current = entry;
+
+    // Update sidebar active state
+    document.querySelectorAll(".sidebar-item").forEach(el => {
+      el.classList.toggle("active", el.dataset.id == entry.id);
+    });
+
+    const d = new Date(entry.display_date + "T00:00:00");
+    const dateStr = d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+
+    document.getElementById("editor").innerHTML = `
+      <div class="editor-header">
+        <div class="editor-date">${dateStr}</div>
+        <button class="save-btn" onclick="save()">Save</button>
+      </div>
+
+      <div class="field">
+        <label>Title</label>
+        <input type="text" id="f-title" value="${esc(entry.title ?? "")}" oninput="updatePreview()" />
+      </div>
+
+      <div class="field">
+        <label>Fun fact / text</label>
+        <textarea id="f-fact" oninput="updatePreview()">${esc(entry.fun_fact ?? "")}</textarea>
+      </div>
+
+      <div class="field">
+        <label>Category</label>
+        <select id="f-category">
+          ${CATEGORIES.map(c => `<option value="${c}" ${entry.category === c ? "selected" : ""}>${CAT_EMOJI[c]} ${c}</option>`).join("")}
+        </select>
+      </div>
+
+      <div class="field photo-section">
+        <label>Photo</label>
+        <div class="photo-preview" id="photoPreview">
+          ${entry.illustration_url
+            ? `<img src="${entry.illustration_url}" id="previewImg" /><button class="remove-photo" onclick="removePhoto()" title="Remove">✕</button>`
+            : `<span>No photo — Unsplash will pick one automatically</span>`}
+        </div>
+        <div class="photo-actions">
+          <label class="photo-btn">
+            📁 Upload photo
+            <input type="file" accept="image/*" onchange="uploadPhoto(this)" />
+          </label>
+          <div class="photo-btn" onclick="useUnsplash()">🔍 Fetch from Unsplash</div>
+        </div>
+        <div class="upload-progress" id="uploadProgress">
+          <div class="upload-progress-bar" id="uploadBar"></div>
+        </div>
+      </div>
+
+      <div class="status-msg" id="statusMsg"></div>
+    `;
+
+    updatePreview();
+  }
+
+  // ── Upload photo ──────────────────────────────────────────────────────────
+  async function uploadPhoto(input) {
+    const file = input.files[0];
+    if (!file || !current) return;
+
+    const ext  = file.name.split(".").pop();
+    const path = `${current.display_date}.${ext}`;
+
+    setStatus("Uploading…");
+    document.getElementById("uploadProgress").style.display = "block";
+    document.getElementById("uploadBar").style.width = "40%";
+
+    const { error } = await sb.storage.from(BUCKET).upload(path, file, { upsert: true });
+    document.getElementById("uploadBar").style.width = "100%";
+
+    if (error) { setStatus("Upload failed: " + error.message, true); return; }
+
+    const { data: { publicUrl } } = sb.storage.from(BUCKET).getPublicUrl(path);
+    current.illustration_url = publicUrl;
+
+    document.getElementById("photoPreview").innerHTML = `
+      <img src="${publicUrl}" id="previewImg" />
+      <button class="remove-photo" onclick="removePhoto()" title="Remove">✕</button>`;
+
+    setTimeout(() => {
+      document.getElementById("uploadProgress").style.display = "none";
+      document.getElementById("uploadBar").style.width = "0%";
+    }, 600);
+
+    setStatus("Photo uploaded ✓", false, true);
+    updatePreview();
+  }
+
+  // ── Fetch from Unsplash ───────────────────────────────────────────────────
+  async function useUnsplash() {
+    if (!current) return;
+    setStatus("Fetching from Unsplash…");
+    // Clear cached URL so the edge function re-fetches
+    current.illustration_url = null;
+    await sb.from("daily_content").update({ illustration_url: null }).eq("id", current.id);
+    // Call edge function to trigger fetch
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/today?date=${current.display_date}`);
+    const data = await res.json();
+    if (data.illustration_url) {
+      current.illustration_url = data.illustration_url;
+      document.getElementById("photoPreview").innerHTML = `
+        <img src="${data.illustration_url}" id="previewImg" />
+        <button class="remove-photo" onclick="removePhoto()" title="Remove">✕</button>`;
+      updatePreview();
+      setStatus("Unsplash photo fetched ✓", false, true);
+    } else {
+      setStatus("Couldn't fetch from Unsplash", true);
+    }
+  }
+
+  // ── Remove photo ──────────────────────────────────────────────────────────
+  function removePhoto() {
+    current.illustration_url = null;
+    document.getElementById("photoPreview").innerHTML =
+      `<span>No photo — Unsplash will pick one automatically</span>`;
+    updatePreview();
+  }
+
+  // ── Save ──────────────────────────────────────────────────────────────────
+  async function save() {
+    if (!current) return;
+    const btn = document.querySelector(".save-btn");
+    btn.disabled = true;
+
+    const updates = {
+      title:            document.getElementById("f-title").value,
+      fun_fact:         document.getElementById("f-fact").value,
+      category:         document.getElementById("f-category").value,
+      illustration_url: current.illustration_url ?? null,
+    };
+
+    const { error } = await sb.from("daily_content").update(updates).eq("id", current.id);
+
+    if (error) {
+      setStatus("Save failed: " + error.message, true);
+    } else {
+      Object.assign(current, updates);
+      setStatus("Saved ✓", false, true);
+      renderSidebar();
+    }
+    btn.disabled = false;
+  }
+
+  // ── Live preview ──────────────────────────────────────────────────────────
+  function updatePreview() {
+    const title   = document.getElementById("f-title")?.value ?? current?.title ?? "";
+    const fact    = document.getElementById("f-fact")?.value  ?? current?.fun_fact ?? "";
+    const photoUrl = current?.illustration_url;
+
+    const tripStart  = new Date("2026-07-11");
+    const today      = new Date(current?.display_date + "T00:00:00");
+    const daysUntil  = Math.ceil((tripStart - today) / 86400000);
+
+    const photo = photoUrl
+      ? `<img src="${photoUrl}" />`
+      : `<div class="photo-placeholder">${CAT_EMOJI[current?.category] ?? "🇮🇹"}</div>`;
+
+    document.getElementById("widgetPreview").innerHTML = `
+      <div class="countdown">
+        <div class="photo-header">
+          ${photo}
+          <div class="number-block">
+            <div class="big-number">${daysUntil > 0 ? daysUntil : "🇮🇹"}</div>
+            <div class="days-label">${daysUntil > 0 ? "days to go" : ""}</div>
+          </div>
+        </div>
+        <div class="content">
+          <div class="fact">${fact}</div>
+        </div>
+      </div>`;
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function esc(str) {
+    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  function setStatus(msg, isError = false, isOk = false) {
+    const el = document.getElementById("statusMsg");
+    if (!el) return;
+    el.textContent = msg;
+    el.className = `status-msg${isError ? " err" : isOk ? " ok" : ""}`;
+  }
+
+  // ── Boot ──────────────────────────────────────────────────────────────────
+  if (getKey()) {
+    document.getElementById("keyModal").style.display = "none";
+    init();
+  }
+</script>
+</body>
+</html>
