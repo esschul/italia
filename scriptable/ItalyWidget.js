@@ -100,16 +100,20 @@ async function buildCountdown(w, data, size) {
 
   const photo = data.illustration_url ? await fetchImage(data.illustration_url) : null;
 
-  // Photo (top portion) — scale to cover, centred, no stretch
+  // Photo (top portion) — cover crop via a dedicated sub-canvas so
+  // overflow is clipped before compositing into the main canvas.
   if (photo) {
     const iW    = photo.size.width;
     const iH    = photo.size.height;
     const scale = Math.max(CW / iW, PHOTO_H / iH);
     const sw    = iW * scale;
     const sh    = iH * scale;
-    const dx    = (CW - sw) / 2;
-    const dy    = (PHOTO_H - sh) / 2;
-    dc.drawImageInRect(photo, new Rect(dx, dy, sw, sh));
+    const pdc   = new DrawContext();
+    pdc.size    = new Size(CW, PHOTO_H);
+    pdc.respectScreenScale = true;
+    pdc.opaque  = true;
+    pdc.drawImageInRect(photo, new Rect((CW - sw) / 2, (PHOTO_H - sh) / 2, sw, sh));
+    dc.drawImageInRect(pdc.getImage(), new Rect(0, 0, CW, PHOTO_H));
   } else {
     dc.setFillColor(new Color("#1A1A2A"));
     dc.fillRect(new Rect(0, 0, CW, PHOTO_H));
