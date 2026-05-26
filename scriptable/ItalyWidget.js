@@ -53,9 +53,14 @@ async function makePhotoHeader(photo, data, width, height) {
   dc.respectScreenScale = true; // render at full screen resolution — no blur
   dc.opaque = true;
 
-  // ── Photo (or dark fallback) ──────────────────────────────────────────────
+  // ── Photo (or dark fallback) — scale to cover, centred, no stretch ───────
   if (photo) {
-    dc.drawImageInRect(photo, new Rect(0, 0, width, height));
+    const iW    = photo.size.width;
+    const iH    = photo.size.height;
+    const scale = Math.max(width / iW, height / iH);
+    const sw    = iW * scale;
+    const sh    = iH * scale;
+    dc.drawImageInRect(photo, new Rect((width - sw) / 2, (height - sh) / 2, sw, sh));
   } else {
     dc.setFillColor(new Color("#1A1A2A"));
     dc.fillRect(new Rect(0, 0, width, height));
@@ -95,9 +100,16 @@ async function buildCountdown(w, data, size) {
 
   const photo = data.illustration_url ? await fetchImage(data.illustration_url) : null;
 
-  // Photo (top portion)
+  // Photo (top portion) — scale to cover, centred, no stretch
   if (photo) {
-    dc.drawImageInRect(photo, new Rect(0, 0, CW, PHOTO_H));
+    const iW    = photo.size.width;
+    const iH    = photo.size.height;
+    const scale = Math.max(CW / iW, PHOTO_H / iH);
+    const sw    = iW * scale;
+    const sh    = iH * scale;
+    const dx    = (CW - sw) / 2;
+    const dy    = (PHOTO_H - sh) / 2;
+    dc.drawImageInRect(photo, new Rect(dx, dy, sw, sh));
   } else {
     dc.setFillColor(new Color("#1A1A2A"));
     dc.fillRect(new Rect(0, 0, CW, PHOTO_H));
