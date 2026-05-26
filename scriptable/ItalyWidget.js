@@ -7,7 +7,7 @@ if (config.runsInApp) {
     const latest = await new Request(
       "https://raw.githubusercontent.com/esschul/italia/main/scriptable/ItalyWidget.js"
     ).loadString();
-    if (latest && latest.length > 500 && latest.includes("EDGE_URL")) {
+    if (latest && latest.includes("EDGE_URL")) {
       const filename = Script.name() + ".js";
       // Try iCloud first (most common), then local storage
       for (const fm of [FileManager.iCloud(), FileManager.local()]) {
