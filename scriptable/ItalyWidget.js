@@ -8,9 +8,12 @@ if (config.runsInApp) {
       "https://raw.githubusercontent.com/esschul/italia/main/scriptable/ItalyWidget.js"
     ).loadString();
     if (latest && latest.length > 500 && latest.includes("EDGE_URL")) {
-      const fm = FileManager.local();
-      const path = fm.joinPath(fm.documentsDirectory(), Script.name() + ".js");
-      if (fm.fileExists(path)) fm.writeString(path, latest);
+      const filename = Script.name() + ".js";
+      // Try iCloud first (most common), then local storage
+      for (const fm of [FileManager.iCloud(), FileManager.local()]) {
+        const path = fm.joinPath(fm.documentsDirectory(), filename);
+        if (fm.fileExists(path)) { fm.writeString(path, latest); break; }
+      }
     }
   } catch (_) {}
 }
