@@ -24,6 +24,114 @@
     "lat": 41.9029,
     "lon": 12.4534,
     "description": "Vatican Museums early (book in advance!), Sistine Chapel, St Peter's. Lunch in Prati neighbourhood.",
-    "fun_fact": "Michelangelo painted the Sistine Chapel ceiling lying on his back over 4 years (1508–1512). He was a sculptor, not a painter — he considered the commission an insult."
+    "fun_fact": "Michelangelo painted the Sistine Chapel ceiling lying on his back over 4 years. He was a sculptor, not a painter — he considered the commission an insult."
+  },
+  {
+    "date": "2026-07-14",
+    "title": "Day 4 — Borghese & Piazzas 🌿",
+    "location": "Rome",
+    "lat": 41.9142,
+    "lon": 12.4922,
+    "description": "Borghese Gallery (pre-book — only 360 people allowed at a time). Stroll Piazza del Popolo, Spanish Steps, Via Condotti window shopping.",
+    "fun_fact": "The Borghese Gallery houses one of the finest private art collections ever assembled. Cardinal Borghese spent decades 'acquiring' pieces — some by threatening artists with arrest."
+  },
+  {
+    "date": "2026-07-15",
+    "title": "Day 5 — Pantheon & Campo de' Fiori ☀️",
+    "location": "Rome",
+    "lat": 41.8986,
+    "lon": 12.4769,
+    "description": "Pantheon in the morning (free, but arrive early). Piazza Navona for coffee. Campo de' Fiori market. Aperitivo somewhere good.",
+    "fun_fact": "The Pantheon's concrete dome has stood for 1,900 years with no internal supports. The oculus at the top is 9 metres wide — when it rains, the floor drains it."
+  },
+  {
+    "date": "2026-07-16",
+    "title": "Day 6 — Tivoli Day Trip 🏰",
+    "location": "Tivoli",
+    "lat": 41.9632,
+    "lon": 12.7984,
+    "description": "45 minutes from Rome: Villa d'Este with its 500 fountains and terraced gardens, then Hadrian's Villa — the emperor's personal city spanning 120 hectares.",
+    "fun_fact": "Hadrian's Villa was so vast it had its own baths, libraries, theatres and temples. Hadrian built miniature replicas of his favourite places from across the empire."
+  },
+  {
+    "date": "2026-07-17",
+    "title": "Day 7 — Last Day in Rome 🍷",
+    "location": "Rome",
+    "lat": 41.8956,
+    "lon": 12.4823,
+    "description": "Slow morning. Testaccio market for lunch — the most authentic food neighbourhood in Rome. Aventine Hill and the Knights of Malta keyhole with a perfect view of St Peter's dome.",
+    "fun_fact": "Through the keyhole at the Priory of the Knights of Malta on Aventine Hill, you see three countries simultaneously: Italy, Vatican City, and the sovereign territory of the Knights of Malta."
+  },
+  {
+    "date": "2026-07-18",
+    "title": "Day 8 — Il Monastero Collection 🕌",
+    "location": "Umbria",
+    "lat": 43.1122,
+    "lon": 12.3888,
+    "description": "Drive north from Rome into Umbria. Check in to Il Monastero Collection — a converted monastery in the Umbrian hills. Explore the grounds, rest, eat well.",
+    "fun_fact": "Umbria is called the 'green heart of Italy' — the only landlocked region in central Italy. No coast, no motorway crowds, just medieval hilltowns, truffles and silence."
+  },
+  {
+    "date": "2026-07-19",
+    "title": "Day 9 — Umbrian Hills 🌄",
+    "location": "Umbria",
+    "lat": 43.1122,
+    "lon": 12.3888,
+    "description": "A slower day based at Il Monastero. Walk the surrounding countryside. Visit a nearby hilltown — Spello or Bevagna. Black truffle pasta for dinner, because you have to.",
+    "fun_fact": "Umbria produces some of Italy's finest black truffles, found under oak trees by trained dogs. A single kilogram can fetch €3,000. The best ones smell of earth, garlic and something ancient."
+  },
+  {
+    "date": "2026-07-20",
+    "title": "Day 10 — Assisi 🙏",
+    "location": "Assisi",
+    "lat": 43.0707,
+    "lon": 12.6193,
+    "description": "Check in to Hotel Assisi. Walk up to the Basilica di San Francesco — one of the most beautiful churches in Italy. The lower basilica is cooler and darker, with Giotto's frescoes. The town is tiny; you can walk everything.",
+    "fun_fact": "St Francis gave up a life of wealth and military ambition after a series of visions in his early twenties. He founded an order of 5,000 friars before he died at 44. The Basilica began construction within two years of his death."
+  },
+  {
+    "date": "2026-07-21",
+    "title": "Day 11 — Fattoria Fibbiano 🍷",
+    "location": "Tuscany",
+    "lat": 43.5373,
+    "lon": 10.6847,
+    "description": "Drive west into Tuscany. Hotel Fattoria Fibbiano is a working winery in the Pisan hills — vineyards, olive groves, terracotta. Wine tasting this evening is not optional.",
+    "fun_fact": "Tuscany has 11 DOCG wine designations — the highest Italian wine quality tier. The Pisan hills produce Montescudaio wines that most tourists never encounter because they barely leave the region."
+  },
+  {
+    "date": "2026-07-22",
+    "title": "Day 12 — Tuscan Countryside 🌻",
+    "location": "Tuscany",
+    "lat": 43.5373,
+    "lon": 10.6847,
+    "description": "Based at Fattoria Fibbiano. Drive into Volterra — an Etruscan city so old it predates Rome. Dramatic clifftop position, alabaster workshops, Roman theatre still visible below the town.",
+    "fun_fact": "Volterra was a major Etruscan city when Rome was still a village. The Etruscans built here around 800 BC. Their civilisation was eventually absorbed by Rome — but they gave the Romans their alphabet, arch construction, and religious practices."
+  },
+  {
+    "date": "2026-07-23",
+    "title": "Day 13 — Hotel Recostano 🌿",
+    "location": "Tuscany",
+    "lat": 43.3911,
+    "lon": 11.3308,
+    "description": "Check in to Hotel Recostano Residence — the last stop before home. Settle in. Find the best local restaurant and eat slowly. Tomorrow is the last full day.",
+    "fun_fact": "The word 'Tuscany' comes from the Etruscan people (Tusci in Latin) who dominated central Italy before Rome. Even the name of the land remembers them."
+  },
+  {
+    "date": "2026-07-24",
+    "title": "Day 14 — Last Full Day 🌅",
+    "location": "Tuscany",
+    "lat": 43.3911,
+    "lon": 11.3308,
+    "description": "The last full day. No rushing. Buy good olive oil and a bottle of something excellent. Walk somewhere beautiful. Eat a long dinner. Come back to the room slow.",
+    "fun_fact": "Italy is the world's largest wine producer and the largest exporter. The average Italian drinks about 40 litres of wine per year. They consider this moderate."
+  },
+  {
+    "date": "2026-07-25",
+    "title": "Day 15 — Fly Home ✈️",
+    "location": "Oslo",
+    "lat": 59.9139,
+    "lon": 10.7522,
+    "description": "Transfer to airport. The flight home. Sit back, close your eyes, and go through every meal, every piazza, every evening. You'll be back.",
+    "fun_fact": "Italy has more UNESCO World Heritage Sites than any other country in the world — 58 and counting. You've seen some of the best of them."
   }
 ]
