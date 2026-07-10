@@ -2,20 +2,20 @@
   {
     "date": "2026-07-11",
     "title": "Day 1 — Arrival 🛬",
-    "location": "Il Monastero Collection",
-    "lat": 43.1122,
-    "lon": 12.3888,
-    "description": "Fly in, check in to Il Monastero Collection. Drop the bags, breathe the air, find food. The trip begins.",
-    "fun_fact": "Italy has more UNESCO World Heritage Sites than any other country — 58. You're about to see some of the best of them."
+    "location": "Rome",
+    "lat": 41.8874,
+    "lon": 12.4840,
+    "description": "Fly in, check in to Il Monastero Collection — Via dei Cerchi, right next to Circus Maximus. Drop the bags, breathe the air, walk to the Aventine Hill for the best free view in Rome.",
+    "fun_fact": "The Circus Maximus directly outside the hotel once held 250,000 spectators — a quarter of Rome's entire population. It's the largest entertainment venue ever built."
   },
   {
     "date": "2026-07-12",
-    "title": "Day 2 — Il Monastero 🕌",
-    "location": "Il Monastero Collection",
-    "lat": 43.1122,
-    "lon": 12.3888,
-    "description": "A slower day based at Il Monastero. Walk the surrounding countryside. Find the best local restaurant and stay too long.",
-    "fun_fact": "Umbria is called the green heart of Italy — the only landlocked region in central Italy. Medieval hilltowns, truffles, and very few tourists."
+    "title": "Day 2 — Rome 🏛️",
+    "location": "Rome",
+    "lat": 41.8874,
+    "lon": 12.4840,
+    "description": "Based in Rome. Colosseum and Roman Forum are a 15-minute walk. Trastevere for dinner in the evening — the most atmospheric neighbourhood in the city after dark.",
+    "fun_fact": "Rome has more than 280 public drinking fountains called nasoni (big noses). The water runs continuously and is perfectly drinkable — locals fill bottles from them daily."
   },
   {
     "date": "2026-07-13",
