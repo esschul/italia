@@ -74,7 +74,8 @@ async function upsert(row) {
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
-const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Rome" });
+const today = process.env.DATE
+  ?? new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Rome" });
 console.log(`Running for date: ${today}`);
 
 const itinerary = JSON.parse(
